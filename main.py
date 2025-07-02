@@ -5,6 +5,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 import re
 from flet import WEB_BROWSER
 from datetime import datetime, date
+import os
+import json
+
 
 COR_AZUL_CLARO = ft.Colors.BLUE_100
 COR_CINZA_CLARO = ft.Colors.GREY_200
@@ -24,9 +27,16 @@ def cor_gradiente(proporcao):
     b = int(verde[2] + (vermelho[2] - verde[2]) * proporcao)
     return f"#{r:02x}{g:02x}{b:02x}"
 
-def ler_checklists():
+def obter_credenciais():
     escopo = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    credenciais = ServiceAccountCredentials.from_json_keyfile_name("silent-region-449314-v3-299b6f797db4.json", escopo)
+    json_str = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+    if not json_str:
+        raise Exception("Variável de ambiente GOOGLE_CREDENTIALS_JSON não definida.")
+    dados = json.loads(json_str)
+    return ServiceAccountCredentials.from_json_keyfile_dict(dados, escopo)
+
+def ler_checklists():
+    credenciais = obter_credenciais()
     cliente = gspread.authorize(credenciais)
     planilha = cliente.open("DADOS CHECKLIST_FLET")
     aba = planilha.worksheet("Checklist")
@@ -407,12 +417,7 @@ def main(page: ft.Page):
         def salvar_alteracao(e):
             try:
                 registros = ler_checklists()
-                cliente = gspread.authorize(
-                    ServiceAccountCredentials.from_json_keyfile_name(
-                        "silent-region-449314-v3-299b6f797db4.json",
-                        ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"],
-                    )
-                )
+                cliente = gspread.authorize(obter_credenciais())
                 planilha = cliente.open("DADOS CHECKLIST_FLET")
                 aba = planilha.worksheet("Checklist")
 
