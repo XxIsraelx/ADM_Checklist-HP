@@ -29,10 +29,11 @@ def cor_gradiente(proporcao):
 
 def obter_credenciais():
     escopo = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    json_str = os.environ.get("GOOGLE_CREDS_JSON")
+    json_str = os.environ.get("GOOGLE_CREDENTIALS_JSON")
     if not json_str:
         raise Exception("Variável de ambiente GOOGLE_CREDENTIALS_JSON não definida.")
     dados = json.loads(json_str)
+
     return ServiceAccountCredentials.from_json_keyfile_dict(dados, escopo)
 
 def ler_checklists():
