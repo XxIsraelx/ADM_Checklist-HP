@@ -662,4 +662,6 @@ def main(page: ft.Page):
 
     mostrar_pagina("relatorios")
 
-ft.app(target=main, view=WEB_BROWSER)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8550))  # pega a porta do Render ou usa 8550 localmente
+    ft.app(target=main, view=WEB_BROWSER, port=port)
